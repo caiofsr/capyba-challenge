@@ -31,7 +31,7 @@ model Post {
   title      String
   content    String
   isDraft    Boolean  @default(false) @map("is_draft")
-  restrict   Boolean  @default(false)
+  isRestrict Boolean  @default(false) @map("is_restrict")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @default(now()) @map("updated_at")
   userId     Int      @map("user_id")
