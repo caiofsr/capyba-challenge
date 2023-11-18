@@ -1,5 +1,5 @@
-import { SignIn } from './sign-in';
 import { JwtService } from '@nestjs/jwt';
+import { SignInUseCase } from './sign-in';
 import { AuthService } from '@infra/auth/auth.service';
 import { User } from '@application/entities/user/user';
 import { UnauthorizedException } from '@nestjs/common';
@@ -8,18 +8,18 @@ import { InMemoryUserRepository } from '@test/repositories/in-memory-user-reposi
 
 jest.mock('@nestjs/jwt');
 
-describe('Signin', () => {
+describe('SignUp', () => {
   let userRepository: InMemoryUserRepository;
   let jwtService: JwtService;
   let authService: AuthService;
-  let signIn: SignIn;
+  let signIn: SignInUseCase;
   let user: User;
 
   beforeAll(async () => {
     userRepository = new InMemoryUserRepository();
     jwtService = new JwtService();
     authService = new AuthService(userRepository, jwtService);
-    signIn = new SignIn(authService);
+    signIn = new SignInUseCase(authService);
     user = await makeUser({ password: 'super secret password' });
   });
 

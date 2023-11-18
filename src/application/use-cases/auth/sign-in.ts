@@ -1,7 +1,7 @@
 import { AuthService } from '@infra/auth/auth.service';
 import { UnauthorizedException } from '@nestjs/common';
 
-export class SignIn {
+export class SignInUseCase {
   constructor(private authService: AuthService) {}
 
   async execute(email: string, password: string) {
