@@ -1,21 +1,40 @@
-import { AuthService } from '@infra/auth/auth.service';
-import { UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { User } from '@application/entities/user/user';
+import { S3Service } from '@infra/upload/s3.service';
+import { UserRepository } from '@application/repositories/user-repository';
 
-export class SignInUseCase {
-  constructor(private authService: AuthService) {}
+interface SignUpRequest {
+  name: string;
+  password: string;
+  email: string;
+  file: Express.Multer.File;
+}
 
-  async execute(email: string, password: string) {
-    const user = await this.authService.validateUser(email, password);
+interface SignUpResponse {
+  user: User;
+}
 
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+@Injectable()
+export class SignUpUseCase {
+  constructor(
+    private userRepository: UserRepository,
+    private s3Service: S3Service,
+  ) {}
 
-    const { access_token } = await this.authService.login(user);
+  async execute({ name, password, email, file }: SignUpRequest): Promise<SignUpResponse> {
+    const photoUrl = await this.s3Service.uploadFile(file);
+
+    const user = new User({
+      name,
+      password,
+      email,
+      photoUrl,
+    });
+
+    const persistedUser = await this.userRepository.create(user);
 
     return {
-      type: 'Bearer',
-      access_token,
+      user: persistedUser,
     };
   }
 }
