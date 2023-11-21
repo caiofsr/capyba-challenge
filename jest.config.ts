@@ -14,6 +14,7 @@ const config: Config = {
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: './coverage',
   testEnvironment: 'node',
+  resetMocks: true,
 };
 
 export default config;

@@ -22,7 +22,14 @@ export class SignUpUseCase {
   ) {}
 
   async execute({ name, password, email, file }: SignUpRequest): Promise<SignUpResponse> {
-    const photoUrl = await this.s3Service.uploadFile(file);
+    let photoUrl: string;
+
+    if (file) {
+      console.log('chamou');
+      photoUrl = await this.s3Service.uploadFile(file);
+    } else {
+      photoUrl = `https://ui-avatars.com/api/?name=${name}&size=512`;
+    }
 
     const user = new User({
       name,
@@ -31,10 +38,8 @@ export class SignUpUseCase {
       photoUrl,
     });
 
-    const persistedUser = await this.userRepository.create(user);
+    await this.userRepository.create(user);
 
-    return {
-      user: persistedUser,
-    };
+    return;
   }
 }

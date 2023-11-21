@@ -13,12 +13,26 @@ describe('SignUp', () => {
     const { unit, unitRef } = TestBed.create(SignUpUseCase).compile();
 
     signUpUseCase = unit;
+    s3Service = unitRef.get(S3Service);
     // @ts-expect-error
     userRepository = unitRef.get(UserRepository);
-    s3Service = unitRef.get(S3Service);
   });
 
-  it('should create a new user', async () => {
+  it('should create a new user with upload to S3', async () => {
+    const signUpRequest = {
+      name: 'John Doe',
+      password: 'password123',
+      email: 'johndoe@example.com',
+      file: {} as Express.Multer.File,
+    };
+
+    await signUpUseCase.execute(signUpRequest);
+
+    expect(userRepository.create).toHaveBeenCalled();
+    expect(s3Service.uploadFile).toHaveBeenCalled();
+  });
+
+  it('should create a new user without upload to S3', async () => {
     const signUpRequest = {
       name: 'John Doe',
       password: 'password123',
@@ -29,6 +43,6 @@ describe('SignUp', () => {
     await signUpUseCase.execute(signUpRequest);
 
     expect(userRepository.create).toHaveBeenCalled();
-    expect(s3Service.uploadFile).toHaveBeenCalled();
+    expect(s3Service.uploadFile).not.toHaveBeenCalled();
   });
 });
