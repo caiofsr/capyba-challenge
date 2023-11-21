@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '@infra/auth/auth.module';
+import { HttpModule } from '@infra/http/http.module';
 import { UploadModule } from '@infra/upload/upload.module';
 import { DatabaseModule } from '@infra/database/database.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, AuthModule, UploadModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, AuthModule, UploadModule, HttpModule],
   controllers: [],
   providers: [],
 })

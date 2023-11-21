@@ -25,7 +25,6 @@ export class SignUpUseCase {
     let photoUrl: string;
 
     if (file) {
-      console.log('chamou');
       photoUrl = await this.s3Service.uploadFile(file);
     } else {
       photoUrl = `https://ui-avatars.com/api/?name=${name}&size=512`;
