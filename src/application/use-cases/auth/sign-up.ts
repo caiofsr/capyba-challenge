@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@application/entities/user/user';
 import { S3Service } from '@infra/upload/s3.service';
+import { User } from '@application/entities/user/user';
+import { Password } from '@application/entities/user/password';
 import { UserRepository } from '@application/repositories/user-repository';
 
 interface SignUpRequest {
@@ -32,7 +33,7 @@ export class SignUpUseCase {
 
     const user = new User({
       name,
-      password,
+      password: await Password.hashPassword(password),
       email,
       photoUrl,
     });
