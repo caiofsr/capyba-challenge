@@ -24,7 +24,7 @@ describe('SignIn', () => {
   });
 
   it('should be able to create a new access token', async () => {
-    userRepository.save(user);
+    userRepository.create(user);
 
     const { type } = await signIn.execute(user.email, 'super secret password');
 
