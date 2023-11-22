@@ -1,5 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Cache } from 'cache-manager';
+import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
 import { S3Service } from '@infra/upload/s3.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { MailerService } from '@nestjs-modules/mailer';
 import { User } from '@application/entities/user/user';
 import { Password } from '@application/entities/user/password';
 import { UserRepository } from '@application/repositories/user-repository';
@@ -11,18 +15,17 @@ interface SignUpRequest {
   file: Express.Multer.File;
 }
 
-interface SignUpResponse {
-  user: User;
-}
-
 @Injectable()
 export class SignUpUseCase {
   constructor(
-    private userRepository: UserRepository,
     private s3Service: S3Service,
+    private mailerService: MailerService,
+    private configService: ConfigService,
+    private userRepository: UserRepository,
+    @Inject(CACHE_MANAGER) private redisService: Cache,
   ) {}
 
-  async execute({ name, password, email, file }: SignUpRequest): Promise<SignUpResponse> {
+  async execute({ name, password, email, file }: SignUpRequest): Promise<void> {
     let photoUrl: string;
 
     if (file) {
@@ -39,6 +42,18 @@ export class SignUpUseCase {
     });
 
     await this.userRepository.create(user);
+
+    const token = Buffer.from(email).toString('base64');
+
+    await this.redisService.set(`confirmation:${token}`, user.id);
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Confirm your email',
+      text: `http://${this.configService.getOrThrow('HOST')}:${this.configService.getOrThrow(
+        'PORT',
+      )}/v1/auth/confirm?token=${token}`,
+    });
 
     return;
   }
