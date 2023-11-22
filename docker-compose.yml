@@ -13,7 +13,7 @@ services:
     volumes:
       - nestpgsql:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-q", "-d", "capyba-challenge", "-U", "postgrs"]
+      test: ["CMD", "pg_isready", "-q", "-d", "capyba-challenge", "-U", "postgres"]
       retries: 3
       timeout: 5s
 

@@ -19,7 +19,7 @@ export class SignInUseCase {
 
     const { accessToken } = await this.authService.login(user);
 
-    await this.redisService.set(`jwt:${user.externalId}`, accessToken);
+    await this.redisService.set(`jwt:${user.externalId}`, accessToken, 0);
 
     return {
       accessToken,

@@ -16,6 +16,7 @@ import { DatabaseModule } from '@infra/database/database.module';
       isGlobal: true,
       store: redisStore,
       url: process.env.REDIS_URL,
+      ttl: 0,
     }),
     MailerModule.forRoot({
       transport: {

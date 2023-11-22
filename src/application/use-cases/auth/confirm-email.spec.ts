@@ -26,7 +26,7 @@ describe('Confirm Email', () => {
   });
 
   it('should update user if token is valid', async () => {
-    redisService.get.mockResolvedValue(user.id);
+    redisService.get.mockResolvedValue(user.externalId);
     userRepository.findById.mockResolvedValue(user);
 
     await useCase.execute('token');
