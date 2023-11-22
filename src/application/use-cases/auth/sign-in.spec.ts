@@ -7,9 +7,7 @@ import { AuthService } from '@infra/auth/auth.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { makeUser } from '@test/factories/user-factory';
 
-jest.mock('@nestjs/jwt');
-
-describe.only('SignIn', () => {
+describe('SignIn', () => {
   let user: User;
   let signInUseCase: SignInUseCase;
   let redisService: jest.Mocked<Cache>;
