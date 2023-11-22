@@ -4,6 +4,7 @@ import { User as PrismaUser } from '@prisma/client';
 export class PrismaUserMapper {
   static toPrisma(user: User) {
     return {
+      id: user.id,
       externalId: user.externalId,
       name: user.name,
       email: user.email,
