@@ -32,6 +32,8 @@ describe('Confirm Email', () => {
     await useCase.execute('token');
 
     expect(userRepository.save).toHaveBeenCalled();
+    expect(redisService.get).toHaveBeenCalled();
+    expect(redisService.del).toHaveBeenCalled();
     expect(userRepository.findById).toHaveBeenCalled();
     expect(user.confirmedEmail).toBeTruthy();
   });

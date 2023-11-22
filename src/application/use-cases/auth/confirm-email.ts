@@ -11,7 +11,7 @@ export class ConfirmEmailUseCase {
   ) {}
 
   async execute(token: string) {
-    const userId = await this.redisService.get<string>(`confirmation:${token}`);
+    const userId = await this.redisService.get<number>(`confirmation:${token}`);
 
     if (!userId) {
       throw new BadRequestException('Token does not exist.');
@@ -22,6 +22,8 @@ export class ConfirmEmailUseCase {
     user.confirmEmail();
 
     await this.userRepository.save(user);
+
+    await this.redisService.del(`confirmation:${token}`);
 
     return;
   }
