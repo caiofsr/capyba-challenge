@@ -3,10 +3,11 @@ import { TestBed } from '@automock/jest';
 import { SignUpUseCase } from './sign-up';
 import { ConfigService } from '@nestjs/config';
 import { S3Service } from '@infra/upload/s3.service';
-import { MailerService } from '@nestjs-modules/mailer';
-import { UserRepository } from '@application/repositories/user-repository';
+import { BadRequestException } from '@nestjs/common';
 import { User } from '@application/entities/user/user';
+import { MailerService } from '@nestjs-modules/mailer';
 import { makeUser } from '@test/factories/user-factory';
+import { UserRepository } from '@application/repositories/user-repository';
 
 describe('SignUp', () => {
   let user: User;
@@ -61,5 +62,17 @@ describe('SignUp', () => {
     expect(s3Service.uploadFile).not.toHaveBeenCalled();
     expect(mailerService.sendMail).toHaveBeenCalled();
     expect(configService.getOrThrow).toHaveBeenCalled();
+  });
+
+  it('should not create a user if email is already in use', async () => {
+    const signUpRequest = {
+      name: 'John Doe',
+      password: 'XXXXXXXXXXX',
+      email: 'johndoe@example.com',
+      file: {} as Express.Multer.File,
+    };
+    userRepository.findByEmail.mockResolvedValue(user);
+
+    await expect(signUpUseCase.execute(signUpRequest)).rejects.toThrow(new BadRequestException('User already exists.'));
   });
 });

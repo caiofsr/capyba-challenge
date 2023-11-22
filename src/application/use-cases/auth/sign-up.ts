@@ -1,6 +1,6 @@
 import { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { S3Service } from '@infra/upload/s3.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -27,6 +27,7 @@ export class SignUpUseCase {
 
   async execute({ name, password, email, file }: SignUpRequest): Promise<void> {
     let photoUrl: string;
+    let user: User;
 
     if (file) {
       photoUrl = await this.s3Service.uploadFile(file);
@@ -34,18 +35,24 @@ export class SignUpUseCase {
       photoUrl = `https://ui-avatars.com/api/?name=${name}&size=512`;
     }
 
-    let user = new User({
-      name,
-      password: await Password.hashPassword(password),
-      email,
-      photoUrl,
-    });
+    user = await this.userRepository.findByEmail(email);
 
-    user = await this.userRepository.create(user);
+    if (user) {
+      throw new BadRequestException('User already exists.');
+    }
+
+    user = await this.userRepository.create(
+      new User({
+        name,
+        password: await Password.hashPassword(password),
+        email,
+        photoUrl,
+      }),
+    );
 
     const token = Buffer.from(email).toString('base64');
 
-    await this.redisService.set(`confirmation:${token}`, user.id);
+    await this.redisService.set(`confirmation:${token}`, user.id, 0);
 
     await this.mailerService.sendMail({
       to: email,
