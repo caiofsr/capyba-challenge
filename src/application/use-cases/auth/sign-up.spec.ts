@@ -5,15 +5,18 @@ import { ConfigService } from '@nestjs/config';
 import { S3Service } from '@infra/upload/s3.service';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UserRepository } from '@application/repositories/user-repository';
+import { User } from '@application/entities/user/user';
+import { makeUser } from '@test/factories/user-factory';
 
 describe('SignUp', () => {
+  let user: User;
   let signUpUseCase: SignUpUseCase;
   let s3Service: jest.Mocked<S3Service>;
   let configService: jest.Mocked<ConfigService>;
   let mailerService: jest.Mocked<MailerService>;
   let userRepository: jest.Mocked<UserRepository>;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     const { unit, unitRef } = TestBed.create(SignUpUseCase).compile();
 
     signUpUseCase = unit;
@@ -22,6 +25,8 @@ describe('SignUp', () => {
     mailerService = unitRef.get(MailerService);
     // @ts-expect-error
     userRepository = unitRef.get(UserRepository);
+
+    user = await makeUser();
   });
 
   it('should create a new user with upload to S3', async () => {
@@ -31,6 +36,7 @@ describe('SignUp', () => {
       email: 'johndoe@example.com',
       file: {} as Express.Multer.File,
     };
+    userRepository.create.mockResolvedValue(user);
 
     await signUpUseCase.execute(signUpRequest);
 
@@ -47,6 +53,7 @@ describe('SignUp', () => {
       email: 'johndoe@example.com',
       file: null,
     };
+    userRepository.create.mockResolvedValue(user);
 
     await signUpUseCase.execute(signUpRequest);
 

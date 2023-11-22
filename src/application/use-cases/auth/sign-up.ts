@@ -34,14 +34,14 @@ export class SignUpUseCase {
       photoUrl = `https://ui-avatars.com/api/?name=${name}&size=512`;
     }
 
-    const user = new User({
+    let user = new User({
       name,
       password: await Password.hashPassword(password),
       email,
       photoUrl,
     });
 
-    await this.userRepository.create(user);
+    user = await this.userRepository.create(user);
 
     const token = Buffer.from(email).toString('base64');
 
