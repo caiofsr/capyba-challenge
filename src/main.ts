@@ -15,7 +15,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config, { deepScanRoutes: true });
   SwaggerModule.setup('docs', app, document);
 
+  app.enableCors();
+
   app.useGlobalPipes(new ValidationPipe());
+
   await app.listen(process.env.PORT || 3333);
 }
 bootstrap();
