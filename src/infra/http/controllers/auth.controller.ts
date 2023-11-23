@@ -4,9 +4,9 @@ import { JwtAuthGuard } from '@infra/auth/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SignUpUseCase } from '@application/use-cases/auth/sign-up';
 import { SignInUseCase } from '@application/use-cases/auth/sign-in';
-import { ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SignOutUseCase } from '@application/use-cases/auth/sign-out';
 import { ConfirmEmailUseCase } from '@application/use-cases/auth/confirm-email';
+import { ApiBearerAuth, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -32,6 +32,7 @@ export class AuthController {
 
   @Delete()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiResponse({ status: 200, description: 'JWT deleted successfully' })
   async deleteToken(@Body() body: { userId: string }) {
     await this.signOutUseCase.execute(body.userId);

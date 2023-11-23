@@ -10,6 +10,7 @@ async function bootstrap() {
     .setTitle('Capyba Challenge')
     .setDescription('Documentação da API do capyba challenge')
     .setVersion('0.1')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config, { deepScanRoutes: true });
   SwaggerModule.setup('docs', app, document);
