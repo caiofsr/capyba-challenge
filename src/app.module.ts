@@ -8,6 +8,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import * as redisStore from 'cache-manager-redis-store';
 import { UploadModule } from '@infra/upload/upload.module';
 import { DatabaseModule } from '@infra/database/database.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { DatabaseModule } from '@infra/database/database.module';
     UploadModule,
     HttpModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}
